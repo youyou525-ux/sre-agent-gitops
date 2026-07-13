@@ -8,6 +8,8 @@ kind: Deployment
 metadata:
   name: ollama
   namespace: ai-services
+  labels:
+    app: ollama
 spec:
   replicas: 1
   selector:
@@ -25,6 +27,21 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 11434
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+        volumeMounts:
+        - name: ollama-storage
+          mountPath: /root/.ollama
+      volumes:
+      - name: ollama-storage
+        hostPath:
+          path: /data/ollama
+          type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service
@@ -38,3 +55,4 @@ spec:
   ports:
   - port: 11434
     targetPort: 11434
+    nodePort: 32341
