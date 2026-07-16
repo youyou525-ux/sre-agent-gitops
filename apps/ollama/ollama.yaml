@@ -3,6 +3,19 @@ kind: Namespace
 metadata:
   name: ai-services
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-pvc
+  namespace: ai-services
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: openebs-hostpath
+  resources:
+    requests:
+      storage: 10Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -39,9 +52,8 @@ spec:
           mountPath: /root/.ollama
       volumes:
       - name: ollama-storage
-        hostPath:
-          path: /data/ollama
-          type: DirectoryOrCreate
+        persistentVolumeClaim:
+          claimName: ollama-pvc
 ---
 apiVersion: v1
 kind: Service
